@@ -20,7 +20,7 @@ services:
       - type: bind
         source: ./uploads
         target: /app/static/uploads
-    user: "0:0"  # Default user:group IDs for most Linux systems
+    user: "0:0"
     deploy:
       resources:
         limits:
@@ -57,7 +57,7 @@ services:
       - type: bind
         source: ./uploads
         target: /app/static/uploads
-    user: "1000:1000"  # Default user:group IDs for most Linux systems
+    user: "0:0"
     deploy:
       resources:
         limits:
