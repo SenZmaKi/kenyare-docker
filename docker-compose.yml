@@ -20,7 +20,7 @@ services:
       - type: bind
         source: ./uploads
         target: /app/static/uploads
-    user: "${UID:-1000}:${GID:-1000}"  # Use host user's UID/GID
+    user: "0:0"  # Default user:group IDs for most Linux systems
     deploy:
       resources:
         limits:
@@ -57,7 +57,7 @@ services:
       - type: bind
         source: ./uploads
         target: /app/static/uploads
-    user: "${UID:-1000}:${GID:-1000}"  # Use host user's UID/GID
+    user: "1000:1000"  # Default user:group IDs for most Linux systems
     deploy:
       resources:
         limits:
