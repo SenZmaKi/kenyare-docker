@@ -31,10 +31,16 @@ COPY --from=builder /usr/local/bin/ /usr/local/bin/
 # Copy application
 COPY . .
 
-# Create non-root user
-RUN useradd -m -U kenyare_user && \
-    chown -R kenyare_user:kenyare_user /kenyare
+# Create app user and group with consistent naming
+RUN groupadd -r kenyare_group && useradd -r -g kenyare_group kenyare_user
 
+# Create and set permissions for upload directories
+RUN mkdir -p /app/static/uploads && \
+    chown -R kenyare_user:kenyare_group /app/static/uploads && \
+    chmod -R 755 /app/static/uploads && \
+    chown -R kenyare_user:kenyare_group /kenyare
+
+# Switch to app user
 USER kenyare_user
 
 EXPOSE 8000
