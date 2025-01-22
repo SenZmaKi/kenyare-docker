@@ -60,7 +60,7 @@ services:
           memory: 512M  # Reserve 512MB memory
     restart: unless-stopped  # Restart policy
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]  # Health check command
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]  # Health check command
       interval: 30s  # Interval between health checks
       timeout: 10s  # Timeout for health check
       retries: 3  # Number of retries before marking as unhealthy
