@@ -53,36 +53,46 @@
     open = false;
     showLoading("Generating quotation");
     console.log("Generating quotation...");
-    const properQuotationInput =
-      convertQuotationInputToProperFormat(quotationInput);
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://kenyare-backend:8000";
+    
+    const properQuotationInput = convertQuotationInputToProperFormat(quotationInput);
     let success = false;
+    
     try {
-      const resp = await fetch(`${apiUrl}/api/quotation/output`, {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
+      const resp = await fetch(`${API_BASE_URL}/api/quotation/output`, {
         method: "POST",
         body: JSON.stringify({ quotation_input: properQuotationInput }),
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Origin': '*'
         },
+        signal: controller.signal,
+        credentials: 'omit'
       });
+      
+      clearTimeout(timeoutId);
       success = resp.ok;
+      
       if (success) {
-        console.log("Quotation generated!");
         const resp_json = await resp.json();
         $quotationOutput = resp_json.data.quotation_output;
+        console.log("Quotation generated successfully");
+      } else {
+        throw new Error(`HTTP error! status: ${resp.status}`);
       }
     } catch (error) {
-      console.error(error);
-    }
-    if (!success) {
-      console.log("Error generating quotation");
-      showToast("Failed to generate quotation", true);
+      console.error("Fetch error:", error);
+      showToast(`Failed to generate quotation: ${(error as Error).message}`, true);
       resetLoading();
       return;
     }
-    console.log($quotationOutput);
-    goto("/quotation/output/");
+
+    if (success) {
+      goto("/quotation/output/");
+    }
     resetLoading();
   }
 </script>
