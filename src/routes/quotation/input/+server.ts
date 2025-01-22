@@ -8,14 +8,29 @@ import type { QuotationInput } from '$lib/types';
 async function saveFile(file: File, saveDir: string): Promise<string> {
     const fileExtension = file.name.split('.').pop();
     const fileName = `${randomUUID()}.${fileExtension}`;
-    // Use paths relative to /static/uploads
-    const relativePath = path.join('static/uploads', saveDir, fileName);
-    const filePath = path.join(process.cwd(), relativePath);
-    const arrayBuffer = await file.arrayBuffer();
-    const dataView = new DataView(arrayBuffer);
-    await fs.promises.writeFile(filePath, dataView);
-    // Return path relative to static/uploads for the backend
-    return `/${relativePath}`;
+    
+    // Use absolute paths for file operations
+    const uploadDir = path.join('/app/static/uploads', saveDir);
+    const filePath = path.join(uploadDir, fileName);
+    
+    // Ensure directory exists
+    await fs.promises.mkdir(uploadDir, { recursive: true });
+    
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const dataView = new DataView(arrayBuffer);
+        await fs.promises.writeFile(filePath, dataView);
+        
+        // Return relative path for API
+        return `/static/uploads/${saveDir}/${fileName}`;
+    } catch (err) {
+        console.error(`Failed to save file: ${err}`);
+        if (err instanceof Error) {
+            throw error(500, `Failed to save file: ${err.message}`);
+        } else {
+            throw error(500, 'Failed to save file: Unknown error');
+        }
+    }
 }
 
 export async function POST(event: RequestEvent) {
