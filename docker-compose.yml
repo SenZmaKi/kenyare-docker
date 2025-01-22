@@ -7,12 +7,15 @@ services:
       context: .
       dockerfile: Dockerfile.frontend.txt  # Dockerfile for building the frontend service
     ports:
-      - 5173:5173  # Expose port 5173 for frontend service
+      - "5173:5173"  # Expose port 5173 for frontend service
+      - "24678:24678" # For HMR websockets
     depends_on:
       - kenyare-backend  # Ensure backend starts before frontend
     environment:
       - NODE_ENV=development  # Set environment to development
-      - VITE_API_BASE_URL=${API_BASE_URL}  # API base URL for frontend to communicate with backend
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}  # API base URL for frontend to communicate with backend
+      - VITE_PUBLIC_IP=${VITE_PUBLIC_IP}  # Public IP for frontend
+      - VITE_WS_HOST=${VITE_PUBLIC_IP}
       - HOST=0.0.0.0  # Host for the frontend service
       - UPLOAD_DIR=/app/static/uploads
     volumes:
