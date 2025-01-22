@@ -20,8 +20,6 @@ services:
       - type: bind
         source: ./uploads
         target: /app/static/uploads
-        bind:
-          create_host_path: true
     user: "${UID:-1000}:${GID:-1000}"  # Use host user's UID/GID
     deploy:
       resources:
@@ -56,12 +54,9 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}  # API key for OpenAI
     volumes:
       - kenyare-backend-data:/var/lib/kenyare  # Persistent storage for backend data
-      - ./uploads:/kenyare/uploads  # Mount uploads directory
       - type: bind
         source: ./uploads
         target: /app/static/uploads
-        bind:
-          create_host_path: true
     user: "${UID:-1000}:${GID:-1000}"  # Use host user's UID/GID
     deploy:
       resources:
