@@ -8,20 +8,14 @@ import type { QuotationInput } from '$lib/types';
 async function saveFile(file: File, saveDir: string): Promise<string> {
     const fileExtension = file.name.split('.').pop();
     const fileName = `${randomUUID()}.${fileExtension}`;
-    
-    // Use absolute paths for file operations
-    const uploadDir = path.join('/app/static/uploads', saveDir);
-    const filePath = path.join(uploadDir, fileName);
-    
-    // Ensure directory exists
-    await fs.promises.mkdir(uploadDir, { recursive: true });
+    const filePath = path.join('/app/static/uploads', saveDir, fileName);
     
     try {
         const arrayBuffer = await file.arrayBuffer();
         const dataView = new DataView(arrayBuffer);
         await fs.promises.writeFile(filePath, dataView);
         
-        // Return relative path for API
+        // Return path relative to uploads directory
         return `/static/uploads/${saveDir}/${fileName}`;
     } catch (err) {
         console.error(`Failed to save file: ${err}`);
