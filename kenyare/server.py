@@ -19,9 +19,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Create quotations directory
-QUOTATIONS_DIR = "static/quotations"
-os.makedirs(QUOTATIONS_DIR, exist_ok=True)
+# Update base paths to use shared volume
+BASE_UPLOADS_DIR = "/app/static/uploads"
+PROPOSAL_FORMS_DIR = f"{BASE_UPLOADS_DIR}/proposals"
+FINANCIAL_AUDITS_DIR = f"{BASE_UPLOADS_DIR}/audits"
+QUOTATIONS_DIR = f"{BASE_UPLOADS_DIR}/quotations"
+
+# Create required directories
+for directory in [PROPOSAL_FORMS_DIR, FINANCIAL_AUDITS_DIR, QUOTATIONS_DIR]:
+    os.makedirs(directory, exist_ok=True)
 
 # Clear quotations directory if environment variable is set
 if os.getenv("CLEAR_QUOTATIONS_DIR") == "1":
@@ -53,8 +59,23 @@ class QuotationOutputRequest(BaseModel):
 async def quotation_upload(request: QuotationInputRequest):
     logger.info("Processing quotation input request")
     logger.debug(f"Input parameters: proposal_path={request.proposal_path}, audit_paths={request.audit_paths}")
+    
+    # Adjust paths to be relative to the container's mount point
+    proposal_path = os.path.join("/app", request.proposal_path.lstrip('/'))
+    audit_paths = [os.path.join("/app", path.lstrip('/')) for path in request.audit_paths]
+    
+    # Verify files exist in shared volume
+    if not os.path.exists(proposal_path):
+        logger.error(f"Proposal file not found: {proposal_path}")
+        raise HTTPException(status_code=404, detail="Proposal file not found")
+    
+    for audit_path in audit_paths:
+        if not os.path.exists(audit_path):
+            logger.error(f"Audit file not found: {audit_path}")
+            raise HTTPException(status_code=404, detail=f"Audit file not found: {audit_path}")
+
     try:
-        quotation_input = run_prompt([*request.audit_paths, request.proposal_path])
+        quotation_input = run_prompt([*audit_paths, proposal_path])
         logger.info("Successfully processed quotation input")
         return {"data": {"quotation_input": quotation_input}}
     except Exception as e:

@@ -16,6 +16,7 @@ services:
       - HOST=0.0.0.0  # Host for the frontend service
     volumes:
       - /kenyare/node_modules  # Persistent storage for node_modules between container restarts
+      - uploads:/app/static/uploads
     deploy:
       resources:
         limits:
@@ -50,6 +51,7 @@ services:
     volumes:
       - kenyare-backend-data:/var/lib/kenyare  # Persistent storage for backend data
       - ./uploads:/kenyare/uploads  # Mount uploads directory
+      - uploads:/app/static/uploads
     deploy:
       resources:
         limits:
@@ -107,6 +109,7 @@ services:
 volumes:
   kenyare-backend-data:
     driver: local  # Use local driver for persistent storage
+  uploads:
 
 networks:
   default:

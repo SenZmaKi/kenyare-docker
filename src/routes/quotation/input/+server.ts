@@ -8,11 +8,14 @@ import type { QuotationInput } from '$lib/types';
 async function saveFile(file: File, saveDir: string): Promise<string> {
     const fileExtension = file.name.split('.').pop();
     const fileName = `${randomUUID()}.${fileExtension}`;
-    const filePath = path.join(saveDir, fileName);
+    // Use paths relative to /static/uploads
+    const relativePath = path.join('static/uploads', saveDir, fileName);
+    const filePath = path.join(process.cwd(), relativePath);
     const arrayBuffer = await file.arrayBuffer();
     const dataView = new DataView(arrayBuffer);
     await fs.promises.writeFile(filePath, dataView);
-    return filePath;
+    // Return path relative to static/uploads for the backend
+    return `/${relativePath}`;
 }
 
 export async function POST(event: RequestEvent) {
@@ -24,8 +27,8 @@ export async function POST(event: RequestEvent) {
     if (!financialAuditFiles.length) throw error(400, 'No financial audit files found');
 
     const [proposalFormPath, financialAuditPaths] = await Promise.all([
-        saveFile(proposalFormFile as File, PROPOSAL_FORMS_DIR),
-        Promise.all(financialAuditFiles.map((f) => saveFile(f as File, FINANCIAL_AUDITS_DIR)))
+        saveFile(proposalFormFile as File, 'proposals'),
+        Promise.all(financialAuditFiles.map((f) => saveFile(f as File, 'audits')))
     ]);
 
     const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://kenyare-backend:8000";
