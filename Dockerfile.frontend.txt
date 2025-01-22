@@ -19,6 +19,11 @@ RUN mkdir -p /home/kenyare_user/.npm && \
     chown -R kenyare_user:kenyare_group /home/kenyare_user/.npm && \
     chown -R kenyare_user:kenyare_group /kenyare
 
+# Create upload directories and set permissions with wider permissions
+RUN mkdir -p /app/static/uploads/{proposals,audits,quotations} && \
+    chown -R kenyare_user:kenyare_group /app && \
+    chmod -R 777 /app/static/uploads
+
 # Switch to non-root user
 USER kenyare_user
 
