@@ -13,9 +13,9 @@ services:
       - kenyare-backend  # Ensure backend starts before frontend
     environment:
       - NODE_ENV=development  # Set environment to development
-      - VITE_API_BASE_URL=${VITE_API_BASE_URL}  # API base URL for frontend to communicate with backend
+      - VITE_API_BASE_URL=http://kenyare-backend:8000  # API base URL for frontend to communicate with backend
       - VITE_PUBLIC_IP=${VITE_PUBLIC_IP}  # Public IP for frontend
-      - VITE_WS_HOST=${VITE_PUBLIC_IP}
+      - VITE_WS_HOST=${VITE_WS_HOST}
       - HOST=0.0.0.0  # Host for the frontend service
       - UPLOAD_DIR=/app/static/uploads
     volumes:
@@ -29,9 +29,6 @@ services:
         limits:
           cpus: '1.0'  # Limit CPU usage to 1 core
           memory: 2G  # Limit memory usage to 2GB
-        reservations:
-          cpus: '0.5'  # Reserve 0.5 cores
-          memory: 512M  # Reserve 512MB memory
     restart: unless-stopped  # Restart policy
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5173"]  # Health check command
@@ -66,9 +63,6 @@ services:
         limits:
           cpus: '1.0'  # Limit CPU usage to 1 core
           memory: 1G  # Limit memory usage to 1GB
-        reservations:
-          cpus: '0.5'  # Reserve 0.5 cores
-          memory: 512M  # Reserve 512MB memory
     restart: unless-stopped  # Restart policy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]  # Health check command
@@ -100,9 +94,6 @@ services:
         limits:
           cpus: '0.30'  # Limit CPU usage to 0.3 cores
           memory: 256M  # Limit memory usage to 256MB
-        reservations:
-          cpus: '0.10'  # Reserve 0.1 cores
-          memory: 128M  # Reserve 128MB memory
     restart: unless-stopped  # Restart policy
     healthcheck:
       test: ["CMD", "nginx", "-t"]  # Health check command to test NGINX configuration
