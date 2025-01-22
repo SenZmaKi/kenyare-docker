@@ -5,7 +5,9 @@ import { API_BASE_URL } from '$lib/consts';
 export async function POST(event: RequestEvent) {
     const req_json = await event.request.json();
     const quotation_input: QuotationOutput = req_json.quotation_input;
-    const resp = await fetch(`${API_BASE_URL}/quotation/output`, {
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://kenyare-backend:8000";
+    
+    const resp = await fetch(`${apiUrl}/api/quotation/output`, {
         method: "POST",
         body: JSON.stringify({ quotation_input }),
         headers: {

@@ -14,6 +14,7 @@
   } from "flowbite-svelte-icons";
   import { testQuotationInput, type QuotationInput } from "$lib/types";
   import { goto } from "$app/navigation";
+  import { API_BASE_URL } from "$lib/consts";
   export let quotationInput: QuotationInput = testQuotationInput
   export let open: boolean;
   export let showToast: (text: string, isError?: boolean) => void;
@@ -54,12 +55,10 @@
     console.log("Generating quotation...");
     const properQuotationInput =
       convertQuotationInputToProperFormat(quotationInput);
-    console.log(
-      `properQuotationInput: ${JSON.stringify(properQuotationInput)}`
-    );
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://kenyare-backend:8000";
     let success = false;
     try {
-      const resp = await fetch("/quotation/output", {
+      const resp = await fetch(`${apiUrl}/api/quotation/output`, {
         method: "POST",
         body: JSON.stringify({ quotation_input: properQuotationInput }),
         headers: {
