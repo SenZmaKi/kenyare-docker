@@ -61,7 +61,9 @@
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
-      const resp = await fetch(`${API_BASE_URL}/api/quotation/output`, {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://kenyare-backend:8000";
+
+      const resp = await fetch(`${apiUrl}/api/quotation/output`, {
         method: "POST",
         body: JSON.stringify({ quotation_input: properQuotationInput }),
         headers: {
