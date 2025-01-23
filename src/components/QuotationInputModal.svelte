@@ -62,7 +62,7 @@
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
       const resp = await fetch(`${API_BASE_URL}/api/quotation/output`, {
-        method: "GET",
+        method: "POST",
         body: JSON.stringify({ quotation_input: properQuotationInput }),
         headers: {
           'Accept': 'application/json',
